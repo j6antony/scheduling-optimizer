@@ -13,8 +13,7 @@ class Button:
         self.font = pygame.font.SysFont(None, 24)
 
     def draw(self, screen):
-        pygame.draw.rect(screen, self.current_colour, self.rect, 3)
-
+        pygame.draw.rect(screen, self.current_colour, self.rect)
         text_surface = self.font.render(self.text, True, (0, 0, 0))
         text_rect = text_surface.get_rect(center=self.rect.center)
         screen.blit(text_surface, text_rect)
@@ -29,3 +28,11 @@ class Button:
             self.current_colour = self.hover_colour
         else:
             self.current_colour = self.color
+
+    # -----------------------------
+    # NEW METHOD
+    # -----------------------------
+    def handle_event_local(self, local_pos, event_type=pygame.MOUSEBUTTONDOWN):
+        if event_type == pygame.MOUSEBUTTONDOWN:
+            if self.rect.collidepoint(local_pos):
+                self.action()
