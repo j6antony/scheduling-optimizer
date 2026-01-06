@@ -1,5 +1,6 @@
 import pygame
 from button import Button
+from datetime import datetime
 
 class Task:
     def __init__(self, position, size):
@@ -172,3 +173,10 @@ class Task:
         if data.get("collapsed", False):
             panel.toggle_collapse()
         return panel
+    def convert_data(self):
+        return{
+            "name": self.task_text,
+            "due": datetime.strftime(self.date_text, "%Y-%m-%d"),#note that the due date has to be typed right or it will get fucked so once finished come back and fix
+            "duration": int(self.duration_text) if self.duration_text else 0, # done to handle edge case
+            "availability": [self.availability]
+        }

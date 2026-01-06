@@ -1,6 +1,7 @@
 import pygame
 from button import Button
 from task import Task
+import json
 
 # ------------------------------
 # Window setup
@@ -34,6 +35,13 @@ def new_task():
     y_position = 80 + len(task_panels) * 150  # panel spacing
     panel = Task(position=(150, y_position), size=(500, 220))
     task_panels.append(panel)
+def finished():
+    # convert the data to rigth format
+    panels = []
+    for panel in task_panels:
+        panels.append(panel.convert_data())
+    with open("tasks.json", "w") as file:
+        json.dump(panels, f, indent=4)
 
 # ------------------------------
 # Buttons
