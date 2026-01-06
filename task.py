@@ -176,7 +176,7 @@ class Task:
     def convert_data(self):
         return{
             "name": self.task_text,
-            "due": datetime.strftime(self.date_text, "%Y-%m-%d"),#note that the due date has to be typed right or it will get fucked so once finished come back and fix
+            "due": self.date_text,
             "duration": int(self.duration_text) if self.duration_text else 0, # done to handle edge case
             "availability": [self.availability]
         }

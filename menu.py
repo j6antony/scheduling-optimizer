@@ -36,18 +36,23 @@ def new_task():
     panel = Task(position=(150, y_position), size=(500, 220))
     task_panels.append(panel)
 def finished():
+    global running
     # convert the data to rigth format
+    print("saving tasks:", len(task_panels), task_panels)
     panels = []
     for panel in task_panels:
         panels.append(panel.convert_data())
+    #write the data to a json file
     with open("tasks.json", "w") as file:
-        json.dump(panels, f, indent=4)
+        json.dump(panels, file, indent=4)
+    #close the current window
+    running = False
 
 # ------------------------------
 # Buttons
 # ------------------------------
 add_task = Button(10, 10, 100, 50, "New Task", GREY, (120, 120, 120), new_task)
-
+complete = Button(650, 10, 100, 50, "finished", GREY, (120, 120, 120), finished)
 # ------------------------------
 # Main loop
 # ------------------------------
@@ -65,20 +70,22 @@ while running:
 
         # Buttons and panels
         add_task.handle_event(event)
+        complete.handle_event(event)
         for panel in task_panels:
             panel.handle_event(event)
-
+        
     # --------------------------
     # Updates
     # --------------------------
     mouse_pos = pygame.mouse.get_pos()
     add_task.update_hover(mouse_pos)
-
+    complete.update_hover(mouse_pos)
     # --------------------------
     # Drawing
     # --------------------------
     window.fill(DARKGREY)
     add_task.draw(window)
+    complete.draw(window)
 
     for i, panel in enumerate(task_panels):
         # Adjust y position for scrolling

@@ -22,7 +22,7 @@ class Button:
         if event.type == pygame.MOUSEBUTTONDOWN:
             if self.rect.collidepoint(event.pos):
                 self.action()
-
+        
     def update_hover(self, mouse_pos):
         if self.rect.collidepoint(mouse_pos):
             self.current_colour = self.hover_colour
