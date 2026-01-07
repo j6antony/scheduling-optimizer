@@ -1,6 +1,6 @@
 import pygame
 from button import Button
-from datetime import datetime
+from datetime import date
 
 class Task:
     def __init__(self, position, size):
@@ -176,7 +176,7 @@ class Task:
     def convert_data(self):
         return{
             "name": self.task_text,
-            "due": self.date_text,
+            "due": date.fromisoformat(self.date_text),
             "duration": int(self.duration_text) if self.duration_text else 0, # done to handle edge case
             "availability": [self.availability]
         }

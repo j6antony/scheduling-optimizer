@@ -2,6 +2,7 @@ import pygame
 from button import Button
 from task import Task
 import json
+from datetime import date
 
 # ------------------------------
 # Window setup
@@ -23,7 +24,8 @@ DARKGREY = (38, 36, 36)
 # ------------------------------
 # State
 # ------------------------------
-task_panels = []  # store all TaskPanels
+task_panels = []
+panels = []  # store all TaskPanels
 scroll_offset = 0
 SCROLL_SPEED = 20  # pixels per scroll
 
@@ -39,7 +41,6 @@ def finished():
     global running
     # convert the data to rigth format
     print("saving tasks:", len(task_panels), task_panels)
-    panels = []
     for panel in task_panels:
         panels.append(panel.convert_data())
     #write the data to a json file
@@ -47,6 +48,12 @@ def finished():
         json.dump(panels, file, indent=4)
     #close the current window
     running = False
+# ------------------------------
+# greed algorithim
+# ------------------------------
+
+
+    
 
 # ------------------------------
 # Buttons
