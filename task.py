@@ -17,7 +17,7 @@ class Task:
         self.active_task = False
         self.active_date = False
         self.active_duration = False
-        self.availability = None
+        self.availability = []
 
         # Panel state
         self.collapsed = False
@@ -72,7 +72,10 @@ class Task:
 
         for label, rect in self.buttons.items():
             if rect.collidepoint(local):
-                self.availability = label
+                if label in self.availability:
+                    self.availability.remove(label)
+                else:
+                    self.availability.append(label)
 
     def _handle_keys(self, event):
         if self.active_task:
@@ -134,7 +137,7 @@ class Task:
 
     def _draw_buttons(self):
         for label, rect in self.buttons.items():
-            selected = self.availability == label
+            selected = label in self.availability
             color = (0,180,0) if selected else (100,100,100)
             pygame.draw.rect(self.surface, color, rect)
             txt = self.font.render(label, True, (0,0,0))
@@ -145,7 +148,7 @@ class Task:
             f"Task: {self.task_text or '[empty]'}",
             f"Due: {self.date_text or '[empty]'}",
             f"Duration: {self.duration_text or '[empty]'}",
-            f"Availability: {self.availability or '[none]'}"
+            f"Availability: {', '.join(self.availability) or '[none]'}"
         ]
         y = 20
         for line in lines:
@@ -155,28 +158,45 @@ class Task:
 
     # Save/load support
     def to_dict(self):
+        due = None
+        if self.date_text:
+            if isinstance(self.date_text, date):
+                due = self.date_text
+            else:
+                try:
+                    due = date.fromisoformat(self.date_text)
+                except ValueError:
+                    due = None
+
+        duration = self.duration_text
+        if isinstance(duration, str):
+            duration = int(duration) if duration.isdigit() else 0
+        else:
+            duration = int(duration) if duration is not None else 0
+
         return {
-            "task_text": self.task_text,
-            "date_text": self.date_text,
-            "duration": self.duration_text,
-            "availability": self.availability,
-            "collapsed": self.collapsed
+            "name": self.task_text,
+            "due": due,
+            "duration": duration,
+            "availability": self.availability or []
         }
 
     @classmethod
     def from_dict(cls, data, position):
         panel = cls(position, (500,220))
-        panel.task_text = data.get("task_text","")
-        panel.date_text = data.get("date_text","")
-        panel.duration_text = data.get("duration","")
-        panel.availability = data.get("availability", None)
+        panel.task_text = data.get("task_text") or data.get("name", "")
+        due = data.get("date_text") or data.get("due", "")
+        if isinstance(due, date):
+            panel.date_text = due.isoformat()
+        elif due is None:
+            panel.date_text = ""
+        else:
+            panel.date_text = str(due)
+
+        duration = data.get("duration", "")
+        panel.duration_text = str(duration) if duration is not None else ""
+        availability = data.get("availability", [])
+        panel.availability = availability if isinstance(availability, list) else [availability]
         if data.get("collapsed", False):
             panel.toggle_collapse()
         return panel
-    def convert_data(self):
-        return{
-            "name": self.task_text,
-            "due": date.fromisoformat(self.date_text),
-            "duration": int(self.duration_text) if self.duration_text else 0, # done to handle edge case
-            "availability": [self.availability]
-        }

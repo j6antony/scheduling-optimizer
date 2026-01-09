@@ -2,7 +2,6 @@ import pygame
 from button import Button
 from task import Task
 import json
-from datetime import date
 
 # ------------------------------
 # Window setup
@@ -42,10 +41,10 @@ def finished():
     # convert the data to rigth format
     print("saving tasks:", len(task_panels), task_panels)
     for panel in task_panels:
-        panels.append(panel.convert_data())
+        panels.append(panel.to_dict())
     #write the data to a json file
     with open("tasks.json", "w") as file:
-        json.dump(panels, file, indent=4)
+        json.dump(panels, file, indent=4, default=str)
     #close the current window
     running = False
 # ------------------------------
