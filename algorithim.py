@@ -1,5 +1,6 @@
-from datetime import date
+from datetime import date, timedelta
 from task import Task
+import json
 
 
 class Alorithim:
@@ -11,13 +12,16 @@ class Alorithim:
         self.lowest = None
         self.greatest = None
         self.maxima()
-        if self.greatest is None:
+        schedule_anchor = self.greatest or self._fallback_greatest()
+        if schedule_anchor is None:
             self.days = 0
-            self.schedule = []
+            self.schedule = [[0 for _ in range(3)]]
         else:
-            self.days = max(0, (self.greatest.date_text - self.today).days)
+            if self.greatest is None:
+                self.greatest = schedule_anchor
+            self.days = max(0, (schedule_anchor.date_text - self.today).days)
             self.schedule = [[0 for _ in range(3)] for _ in range(self.days + 1)]
-
+        self.events = {}
     def mainloop(self):
         while len(self.tasks) != 0:
             if self.possible():
@@ -67,6 +71,14 @@ class Alorithim:
                 normalized.append(task)
         self.tasks = normalized
 
+    def _fallback_greatest(self):
+        dated_tasks = [
+            task for task in self.impossible if isinstance(task.date_text, date)
+        ]
+        if not dated_tasks:
+            return None
+        return max(dated_tasks, key=lambda task: task.date_text)
+
     def _normalized_availability(self, availability):
         slots = ["Morning", "Afternoon", "Evening"]
         if not availability:
@@ -107,15 +119,38 @@ class Alorithim:
                 break
             if index > days:
                 break
-            if "Morning" in availability and x[0] == 0:
+            if self.lowest.duration_text > 0 and "Morning" in availability and x[0] == 0:
                 self.schedule[index][0] = self.lowest.task_text
                 self.lowest.duration_text -= 1
-            if "Afternoon" in availability and x[1] == 0:
+            if self.lowest.duration_text > 0 and "Afternoon" in availability and x[1] == 0:
                 self.schedule[index][1] = self.lowest.task_text
                 self.lowest.duration_text -= 1
-            if "Evening" in availability and x[2] == 0:
+            if self.lowest.duration_text > 0 and "Evening" in availability and x[2] == 0:
                 self.schedule[index][2] = self.lowest.task_text
                 self.lowest.duration_text -= 1
         if self.lowest in self.tasks and self.lowest.duration_text > 0:
             self.impossible.append(self.lowest)
             self.tasks.remove(self.lowest)
+    def converter (self):
+        day = date.today()
+        for index, n in enumerate(self.schedule):
+            current = day + timedelta(days=index)
+            key = (current.year, current.month, current.day)
+            self.events[key] = {"morning": None, "afternoon": None, "evening": None}
+            for part, i in enumerate(n):
+                if part == 0:
+                    self.events[key]["morning"] = i
+                elif part == 1:
+                    self.events[key]["afternoon"] = i
+                else:
+                    self.events[key]["evening"] = i
+    def save_events_to_json(self, filename="events.json"):
+        data = {}
+        for (y, m, d), slots in self.events.items():
+            key = f"{y:04d}-{m:02d}-{d:02d}"   # "2026-01-16"
+            data[key] = slots
+        with open(filename, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2)
+        
+                
+                

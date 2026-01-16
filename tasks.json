@@ -1,11 +1,25 @@
 [
     {
-        "name": "fortnite",
-        "due": "2026-02-01",
-        "duration": 3,
+        "name": "fornite",
+        "due": "2026-01-16",
+        "duration": 1,
         "availability": [
-            "Morning",
-            "Afternoon",
+            "Morning"
+        ]
+    },
+    {
+        "name": "rocket league",
+        "due": "2026-01-16",
+        "duration": 1,
+        "availability": [
+            "Afternoon"
+        ]
+    },
+    {
+        "name": "siege",
+        "due": "2026-01-17",
+        "duration": 2,
+        "availability": [
             "Evening"
         ]
     }
